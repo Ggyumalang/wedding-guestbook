@@ -1,73 +1,121 @@
-# React + TypeScript + Vite
+# 축의대 앱
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# 개요
 
-Currently, two official plugins are available:
+: 현재는 수동으로 진행하고 있는 축의대 업무를 프로세스화 하여서 간편하게 만들어보고자 한다!
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# 기존의 불편한 점
 
-## React Compiler
+기존 > 축의대에서 돈봉투를 받고 이를 수기로 적고, 봉투에 금액 기입 후 돈은 따로 보관하고 식권 지급
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+불편한 점 : 나중에 이 수기로 적은 것들을 직접 다 계산해서 맞춰봐야 함 그리고 신부가 직접 해당 봉투와 금액을 보고 엑셀로 정리해야함.
 
-## Expanding the ESLint configuration
+# 핵심 기능 기획 (Core Features)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **초고속 1차 입력**: 봉투를 받는 즉시 **순번, 금액, 식권 수량**만 빠르게 입력하여 접수 속도를 극대화합니다.
+- **상세 정보 보완 (검색/수정)**: 여유가 생길 때(혹은 다른 작업자가) 접수된 순번을 검색하여 **이름, 소속(관계) 등 상세 정보**를 나중에 추가로 기입합니다.
+- **실시간 정산 대시보드**: 입력되는 즉시 총 접수 금액, 접수 건수, 배부된 식권 매수가 실시간으로 계산되어 화면 상단에 표시됩니다. 나중에 수기로 현금과 맞춰보는 시간을 대폭 줄여줍니다.
+- **식권 배부 트래킹**: 금액 입력 시 배부한 식권 매수를 함께 기록하여, 나중에 실제 남은 식권 수량과 시스템상 수량을 쉽게 교차 검증할 수 있습니다.
+- **엑셀/CSV 내보내기 (Export)**: 모든 식이 끝난 후, 클릭 한 번으로 전체 내역을 엑셀 파일로 다운로드하여 신랑 신부에게 카카오톡이나 이메일로 바로 전송할 수 있습니다.
+- **다중 접속 및 실시간 동기화**: 접수대는 보통 2~3명이 동시에 앉아서 작업합니다. 한 사람이 입력한 내역이 다른 사람의 태블릿/노트북에도 실시간으로 반영되어야 중복이나 누락을 막을 수 있습니다.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# 기술 스택 (Tech Stack)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+익숙하게 다루시는 기술들을 조합하면 성능 좋고 실시간성이 보장되는 서비스를 빠르게 구축하실 수 있습니다.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **프론트엔드 (Frontend)**: React
+    - **상태 관리**: Zustand (접수대 환경에서 빠르게 변하는 UI 상태와 모달, 폼 데이터 등을 가볍고 직관적으로 관리)
+    - **서버 상태 및 데이터 패칭**: React Query (서버와의 데이터 동기화 및 상태 캐싱)
+- **백엔드 및 데이터베이스**: Supabase Cloud
+    - PostgreSQL 기반으로 안정적인 데이터 저장이 가능하며, 무엇보다 **실시간 구독(Realtime Subscriptions)** 기능을 활용해 여러 대의 기기에서 동시에 접수를 받아도 즉각적인 데이터 동기화가 가능합니다. 별도의 복잡한 웹소켓 서버를 구축할 필요가 없어 빠른 MVP 개발에 최적입니다.
+- **스타일링**: Tailwind CSS (빠르고 일관된 UI 구현)
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+# UI/UX 핵심 고려사항
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **키보드 중심의 조작**: 현장에서는 화면을 터치하거나 마우스를 움직일 시간조차 부족합니다. 입력창 간의 포커스 이동, 금액 입력 후 저장까지의 흐름이 단축키 위주로 설계되어야 합니다.
+- **오프라인 대응 (선택적 고도화)**: 예식장 로비의 와이파이나 통신 상태가 순간적으로 끊길 수 있습니다. 네트워크가 끊기더라도 로컬에 우선 저장되고, 다시 연결될 때 백엔드로 동기화되는 로직이 있다면 완벽할 것입니다.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+# **🗄️ Supabase 데이터베이스 스키마 설계 (초안)**
+
+결혼식은 여러 번 있을 수 있고(서비스 확장 고려), 각 결혼식마다 수많은 축의금 봉투 데이터가 쌓이는 구조입니다. 크게 두 개의 테이블로 나누는 것이 좋습니다.
+
+**1. `weddings` (결혼식 정보 테이블)**
+어떤 결혼식인지, 언제 하는지 등을 저장합니다.
+
+| **컬럼명** | **타입** | **설명** |
+| --- | --- | --- |
+| `id` | `uuid` (Primary Key) | 결혼식 고유 ID |
+| `bride_name` | `text` | 신부 이름 |
+| `groom_name` | `text` | 신랑 이름 |
+| `wedding_date` | `timestamp` | 예식 일시 |
+| `created_at` | `timestamp` | 생성 일시 |
+
+**2. `envelopes` (축의금 접수 내역 테이블)**
+가장 핵심이 되는 '돈봉투' 데이터입니다. `weddings` 테이블과 연결됩니다.
+
+| **컬럼명** | **타입** | **설명** |
+| --- | --- | --- |
+| `id` | `uuid` (Primary Key) | 봉투 고유 ID |
+| `wedding_id` | `uuid` (Foreign Key) | 어느 결혼식의 데이터인지 연결 (`weddings.id`) |
+| `side` | `text` | 접수처 구분 (예: '신랑측', '신부측') |
+| `seq_number` | `integer` | 봉투 고유 순번 (현장 작성 번호) |
+| `amount` | `integer` | 축의 금액 (예: 100000) |
+| `meal_tickets` | `integer` | 지급한 식권 수량 (예: 2) |
+| `name` | `text` (Nullable) | 하객 이름 (예: '홍길동', 나중에 입력) |
+| `relation` | `text` (Nullable) | 소속 및 관계 (예: '고등학교 동창', 나중에 입력) |
+| `meal_tickets` | `integer` | 지급한 식권 수량 (예: 2) |
+| `memo` | `text` (Nullable) | 특이사항 메모 (예: '동생이 대신 냄') |
+| `created_at` | `timestamp` | 접수된 정확한 시간 |
+| `modified_at` | `timestamp` | 최종 수정 시간 |
+
+# **💡 추후 배포를 위한 개발 포인트**
+
+• **Supabase Realtime**: `envelopes` 테이블에 데이터가 추가(Insert)될 때마다 여러 기기 화면의 총액과 식권 수량이 **새로고침 없이 즉각적으로 업데이트**되도록 Supabase의 실시간 구독 기능을 연결할 것입니다.
+
+• **오프라인 큐 (선택적)**: 예식장 통신 상태가 불안정할 경우를 대비해, 입력한 데이터가 유실되지 않도록 React Query의 Optimistic Update(낙관적 업데이트)와 로컬 스토리지 캐싱을 활용하는 방안도 향후 적용할 수 있습니다.
+
+# UI/UX Layout
+
+## **사용자 동선 설계 (User Flow)**
+
+접수대 현장의 극심한 혼잡도를 고려하여, 사용자가 앱을 켜서 작업을 마치기까지의 단계를 최소화해야 합니다.
+• **Step 1: 진입 및 예식 선택**
+    ◦ 앱 실행 $\rightarrow$ 진행할 예식(신랑/신부) 선택 또는 새 예식 생성.
+    ◦ 접수처 구분 선택 (예: '신랑측 접수대' or '신부측 접수대').
+• **Step 2: 접수대 모드 (Main)**
+    ◦ 봉투 수령 $\rightarrow$ 봉투에 순번 기입 $\rightarrow$ [순번 $\rightarrow$ 금액 $\rightarrow$ 식권 수량] 폼 빠른 입력.
+    ◦ **핵심 UX:** 필수 항목 최소화로 최고 속도 보장. `Enter`로 저장 직후 다음 순번으로 폼 초기화.
+• **Step 3: 상세 정보 보완 및 모니터링 (Search/Edit)**
+    ◦ 방금 입력한 내역이 화면 한쪽에 최근 순으로 즉각 표시.
+    ◦ 검색 기능을 통해 순번이나 금액을 찾아 '이름'과 '소속/관계'를 나중에 업데이트.
+    ◦ 상단 대시보드에 총액 및 남은 식권 수량 실시간 갱신.
+• **Step 4: 정산 및 마감**
+    ◦ 예식 종료 후, '정산하기' 버튼 클릭.
+    ◦ 전체 내역 엑셀(CSV) 다운로드 및 공유.
+
+## **핵심 화면 설계 (UI Layout Blueprint)**
+
+가장 중요한 '접수대 모드' 화면의 레이아웃 구조입니다. 개발하실 때 컴포넌트를 나누는 기준이 됩니다.
+**[접수대 메인 화면 (Desktop/Tablet 최적화)]**
+• **Top Bar (헤더)**
+    ◦ 현재 예식 정보 (예: "김철수 💖 이영희 결혼식 - 신랑측")
+    ◦ **실시간 요약 대시보드 (크고 명확하게 배치):** 총 접수액 / 총 봉투 수 / 배부된 식권 수
+• **Left Section (고속 1차 입력 폼)**
+    ◦ **순번:** (Input - Number) *자동 증가 또는 수동 입력*
+    ◦ **금액:** (Input - Number) *단축 버튼 제공 (+5만, +10만 등)*
+    ◦ **식권 배부:** (Input - Number)
+    ◦ **[접수 완료] 버튼** (Enter 매핑)
+• **Right Section (리스트 및 상세 검색/수정)**
+    ◦ 검색 바 (순번, 이름 등으로 내역 검색)
+    ◦ 리스트 형태의 데이터에서 누락된 정보(이름/관계)를 클릭해 모달로 수정/기입.
+
+# **프론트엔드 상태 관리 및 데이터 흐름 설계**
+
+성능과 실시간성을 모두 잡기 위해, 상태(State)의 역할을 명확히 분리하는 것이 좋습니다.
+• **클라이언트 상태 (UI State - Zustand 활용 권장):**
+    ◦ 현재 입력 중인 폼의 데이터.
+    ◦ 현재 선택된 예식 ID 및 접수처(신랑/신부측) 정보.
+    ◦ 모달 창(수정/삭제 확인창) 열림/닫힘 상태.
+• **서버 상태 및 실시간 캐싱 (Server State - React Query 활용 권장):**
+    ◦ 전체 접수 내역 리스트 데이터 패칭 및 캐싱.
+    ◦ **Optimistic Update (낙관적 업데이트):** 폼 입력 후 `Enter`를 치면, Supabase 서버 응답을 기다리지 않고 화면의 '최근 접수 내역'과 '총액 대시보드'를 즉시 업데이트합니다. 현장 접수자에게 지연 없는 쾌적한 UX를 제공하는 핵심 기술입니다. 이후 백그라운드에서 동기화됩니다.
