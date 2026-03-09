@@ -20,14 +20,14 @@ function AppContent() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <DashboardTopBar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-2 md:p-6 flex flex-col lg:grid lg:grid-cols-12 gap-4 md:gap-6 pb-20 lg:pb-6">
         {/* Left Section: Fast Input Form */}
-        <section className="col-span-1 lg:col-span-8 xl:col-span-8 h-full">
+        <section className="col-span-1 lg:col-span-8 xl:col-span-8 flex-shrink-0">
           <EnvelopeForm />
         </section>
 
         {/* Right Section: Recent List */}
-        <section className="col-span-1 lg:col-span-4 xl:col-span-4 h-full">
+        <section className="col-span-1 lg:col-span-4 xl:col-span-4 flex-1 lg:h-full">
           <RecentEnvelopesList />
         </section>
       </main>

@@ -36,7 +36,7 @@ export function RecentEnvelopesList() {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-[calc(100vh-160px)] relative">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-[500px] lg:h-[calc(100vh-160px)] relative">
             <div className="p-4 border-b border-gray-200 sticky top-0 bg-white rounded-t-xl z-10 space-y-3">
                 <div className="flex justify-between items-center">
                     <h2 className="font-bold text-gray-800">접수 내역 <span className="text-blue-600 text-sm ml-2 font-normal">최신순</span></h2>
@@ -89,7 +89,7 @@ export function RecentEnvelopesList() {
                                     <div className="text-sm text-gray-600 flex gap-4">
                                         <span className="font-semibold text-blue-700">{env.amount.toLocaleString()}원</span>
                                         <span className="text-gray-500">식권 {env.meal_tickets}장</span>
-                                        <span className="text-gray-400 text-xs flex items-center gap-1">
+                                        <span className="text-gray-400 text-xs flex flex-wrap items-center gap-1 mt-1 sm:mt-0">
                                             <span>{new Date(env.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
                                             {env.modified_at && new Date(env.modified_at).getTime() - new Date(env.created_at).getTime() > 1000 && (
                                                 <span className="text-gray-300 italic" title={new Date(env.modified_at).toLocaleString('ko-KR', { hour: '2-digit', minute: '2-digit' })}>(수정됨)</span>
@@ -99,7 +99,8 @@ export function RecentEnvelopesList() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {/* 모바일에서는 버튼이 항상 보이게 하고, 데스크탑에서는 호버 시에만 보이게 설정 */}
+                            <div className="flex items-center gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity flex-col sm:flex-row">
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
