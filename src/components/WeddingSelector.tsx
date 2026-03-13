@@ -41,7 +41,7 @@ export function WeddingSelector() {
             const newWedding = await createWedding.mutateAsync({
                 groom_name: newGroom,
                 bride_name: newBride,
-                password: newPassword || undefined,
+                password: newPassword,
                 wedding_date: new Date().toISOString()
             });
             // 생성 후 바로 입장
