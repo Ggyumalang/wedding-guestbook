@@ -3,6 +3,7 @@ import { useEnvelopes } from '../hooks/useEnvelopes';
 import { useWeddings } from '../hooks/useWeddings';
 import { Users, ReceiptText, Banknote, Download } from 'lucide-react';
 import { exportEnvelopesToExcel } from '../utils/exportToExcel';
+import { Link } from 'react-router-dom';
 
 export function DashboardTopBar() {
     const { weddingId, side, clearWeddingInfo } = useGuestbookStore();
@@ -31,12 +32,20 @@ export function DashboardTopBar() {
                             side || '접수대'
                         )}
                     </h1>
-                    <button
-                        onClick={clearWeddingInfo}
-                        className="text-sm text-gray-400 hover:text-gray-700 underline whitespace-nowrap ml-2"
-                    >
-                        변경
-                    </button>
+                    <div className="flex items-center ml-2 md:ml-4 gap-2">
+                        <button
+                            onClick={clearWeddingInfo}
+                            className="text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-900 bg-white border border-gray-200 hover:bg-gray-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg transition-colors shadow-sm whitespace-nowrap"
+                        >
+                            변경
+                        </button>
+                        <Link 
+                            to="/"
+                            className="text-xs sm:text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 md:px-4 py-1.5 md:py-2 rounded-lg transition-colors shadow-sm whitespace-nowrap"
+                        >
+                            입력 페이지로
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 xl:gap-6 w-full md:w-auto mt-2 md:mt-0">

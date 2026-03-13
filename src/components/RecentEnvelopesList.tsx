@@ -9,6 +9,7 @@ export function RecentEnvelopesList() {
     const [editingEnv, setEditingEnv] = useState<Envelope | null>(null);
     const [editName, setEditName] = useState('');
     const [editRelation, setEditRelation] = useState('');
+    const [editMemo, setEditMemo] = useState('');
 
     const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
     const [showOnlyEmptyName, setShowOnlyEmptyName] = useState(false);
@@ -57,13 +58,14 @@ export function RecentEnvelopesList() {
         setEditingEnv(env);
         setEditName(env.name || '');
         setEditRelation(env.relation || '');
+        setEditMemo(env.memo || '');
     };
 
     const handleSaveEdit = () => {
         if (!editingEnv) return;
         updateEnvelope.mutate({
             id: editingEnv.id,
-            updates: { name: editName, relation: editRelation }
+            updates: { name: editName, relation: editRelation, memo: editMemo }
         });
         setEditingEnv(null);
     };
@@ -272,6 +274,16 @@ export function RecentEnvelopesList() {
                                     value={editRelation}
                                     onChange={(e) => setEditRelation(e.target.value)}
                                     placeholder="예: 신부친구, 회사동료"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">메모</label>
+                                <input
+                                    type="text"
+                                    value={editMemo}
+                                    onChange={(e) => setEditMemo(e.target.value)}
+                                    placeholder="메모 입력"
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>

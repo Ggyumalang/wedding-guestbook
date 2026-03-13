@@ -8,6 +8,7 @@ interface FormValues {
     seq_number: number;
     name: string;
     relation: string;
+    memo: string;
     amount: number;
     meal_tickets: number;
 }
@@ -27,6 +28,7 @@ export function EnvelopeForm() {
             seq_number: 1,
             name: '',
             relation: '',
+            memo: '',
             amount: 0,
             meal_tickets: 1,
         }
@@ -60,7 +62,7 @@ export function EnvelopeForm() {
             relation: data.relation.trim() || null,
             amount: Number(data.amount),
             meal_tickets: Number(data.meal_tickets),
-            memo: null,
+            memo: data.memo.trim() || null,
         };
 
         try {
@@ -70,6 +72,7 @@ export function EnvelopeForm() {
                 seq_number: Number(data.seq_number) + 1,
                 name: '',
                 relation: '',
+                memo: '',
                 amount: 0,
                 meal_tickets: 1,
             });
@@ -83,30 +86,103 @@ export function EnvelopeForm() {
     const seqRegister = register('seq_number', { required: true, valueAsNumber: true });
     const nameRegister = register('name');
     const relationRegister = register('relation');
+    const memoRegister = register('memo');
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full flex flex-col">
-            <h2 className="text-lg font-bold text-gray-800 mb-6">새 접수 입력</h2>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 flex-1 flex flex-col">
-                {/* Seq Number */}
+                {/* Top Row: Seq & Submit */}
+                <div className="flex items-end gap-3">
+                    <div className="flex-1">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">순번 (자동 기입)</label>
+                        <input
+                            type="number"
+                            {...seqRegister}
+                            ref={(e) => {
+                                seqRegister.ref(e);
+                                seqInputRef.current = e;
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    setFocus('amount');
+                                }
+                            }}
+                            className="w-full text-2xl font-bold px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="py-3 px-6 h-[58px] bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold rounded-lg shadow-md transition-colors whitespace-nowrap"
+                    >
+                        완료 (Enter)
+                    </button>
+                </div>
+
+                {/* Amount */}
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">순번 (자동 기입)</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">금액 (원)</label>
                     <input
                         type="number"
-                        {...seqRegister}
-                        ref={(e) => {
-                            seqRegister.ref(e);
-                            seqInputRef.current = e;
-                        }}
+                        {...register('amount', { required: true, min: 0 })}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                                 e.preventDefault();
-                                setFocus('name');
+                                setFocus('meal_tickets');
                             }
                         }}
-                        className="w-full text-2xl font-bold px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        className="w-full text-xl px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-mono mb-2"
                     />
+                    <div className="flex flex-wrap gap-2">
+                        {AMOUNTS.map(amt => (
+                            <button
+                                key={amt}
+                                type="button"
+                                tabIndex={-1}
+                                onClick={() => { setValue('amount', amt); setFocus('meal_tickets'); }}
+                                className={`px-3 py-1.5 text-sm rounded-full font-medium transition-colors ${amount === amt ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'}`}
+                            >
+                                +{(amt / 10000)}만
+                            </button>
+                        ))}
+                    </div>
                 </div>
+
+                {/* Meal Tickets */}
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">식권 수량</label>
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            tabIndex={-1}
+                            onClick={() => setValue('meal_tickets', Math.max(0, watch('meal_tickets') - 1))}
+                            className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xl font-bold"
+                        >
+                            -
+                        </button>
+                        <input
+                            type="number"
+                            {...register('meal_tickets', { min: 0 })}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    setFocus('name');
+                                }
+                            }}
+                            className="w-24 text-center text-2xl font-bold px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        />
+                        <button
+                            type="button"
+                            tabIndex={-1}
+                            onClick={() => setValue('meal_tickets', Number(watch('meal_tickets')) + 1)}
+                            className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xl font-bold"
+                        >
+                            +
+                        </button>
+                    </div>
+                </div>
+
+                <hr className="border-gray-200" />
 
                 {/* Name */}
                 <div>
@@ -141,7 +217,7 @@ export function EnvelopeForm() {
                         onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                                 e.preventDefault();
-                                setFocus('amount');
+                                setFocus('memo');
                             }
                         }}
                         placeholder="관계 입력하거나 Enter로 스킵"
@@ -154,7 +230,7 @@ export function EnvelopeForm() {
                                 key={rel}
                                 type="button"
                                 tabIndex={-1}
-                                onClick={() => { setValue('relation', rel); setFocus('amount'); }}
+                                onClick={() => { setValue('relation', rel); setFocus('memo'); }}
                                 className="px-3 py-1.5 text-sm rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition-colors"
                             >
                                 {rel}
@@ -163,64 +239,21 @@ export function EnvelopeForm() {
                     </div>
                 </div>
 
-                {/* Amount */}
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">금액 (원)</label>
+                {/* Memo */}
+                <div className="pb-4">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">메모 (선택)</label>
                     <input
-                        type="number"
-                        {...register('amount', { required: true, min: 0 })}
-                        className="w-full text-xl px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-mono mb-2"
+                        {...memoRegister}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                // Default form submission handles Enter if we don't prevent it,
+                                // but we let it submit or just leave it.
+                            }
+                        }}
+                        placeholder="특이사항 등의 메모 입력 (Enter로 완료)"
+                        className="w-full text-lg px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        autoComplete="off"
                     />
-                    <div className="flex flex-wrap gap-2">
-                        {AMOUNTS.map(amt => (
-                            <button
-                                key={amt}
-                                type="button"
-                                tabIndex={-1}
-                                onClick={() => { setValue('amount', amt); setFocus('meal_tickets'); }}
-                                className={`px-3 py-1.5 text-sm rounded-full font-medium transition-colors ${amount === amt ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'}`}
-                            >
-                                +{(amt / 10000)}만
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Meal Tickets */}
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">식권 수량</label>
-                    <div className="flex items-center gap-3">
-                        <button
-                            type="button"
-                            tabIndex={-1}
-                            onClick={() => setValue('meal_tickets', Math.max(0, watch('meal_tickets') - 1))}
-                            className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xl font-bold"
-                        >
-                            -
-                        </button>
-                        <input
-                            type="number"
-                            {...register('meal_tickets', { min: 0 })}
-                            className="w-24 text-center text-2xl font-bold px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                        />
-                        <button
-                            type="button"
-                            tabIndex={-1}
-                            onClick={() => setValue('meal_tickets', Number(watch('meal_tickets')) + 1)}
-                            className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xl font-bold"
-                        >
-                            +
-                        </button>
-                    </div>
-                </div>
-
-                <div className="mt-auto pt-6">
-                    <button
-                        type="submit"
-                        className="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold rounded-xl shadow-md transition-colors flex justify-center items-center"
-                    >
-                        접수 완료 (Enter)
-                    </button>
                 </div>
             </form>
         </div>
