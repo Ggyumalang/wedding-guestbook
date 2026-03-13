@@ -19,7 +19,7 @@ export function MiniRecentList() {
         <>
             {/* Sidebar Panel */}
             <div
-                className={`fixed top-0 right-0 h-full bg-white shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)] border-l border-gray-200 z-40 transition-all duration-300 ease-in-out flex flex-col ${isOpen ? 'w-80 md:w-96 translate-x-0' : 'w-0 translate-x-full'}`}
+                className={`fixed top-16 right-0 h-full bg-white shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)] border-l border-gray-200 z-40 transition-all duration-300 ease-in-out flex flex-col ${isOpen ? 'w-80 md:w-96 translate-x-0' : 'w-0 translate-x-full'}`}
             >
                 {/* Header */}
                 <div className="bg-gray-800 text-white p-4 flex justify-between items-center shrink-0 h-[64px] border-b border-gray-700">
