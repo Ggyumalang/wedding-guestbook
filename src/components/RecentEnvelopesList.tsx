@@ -4,7 +4,12 @@ import { useEnvelopes } from '../hooks/useEnvelopes';
 import { Trash2, Edit2, Search, X, ArrowDownAZ, ArrowUpZA, UserX, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Envelope } from '../types/database';
 
-export function RecentEnvelopesList() {
+interface RecentEnvelopesListProps {
+    isExpanded?: boolean;
+    onToggle?: () => void;
+}
+
+export function RecentEnvelopesList({ isExpanded = true, onToggle }: RecentEnvelopesListProps) {
     const { envelopes, isLoading, deleteEnvelope, updateEnvelope } = useEnvelopes();
     const [searchQuery, setSearchQuery] = useState('');
     const [editingEnv, setEditingEnv] = useState<Envelope | null>(null);
@@ -85,13 +90,44 @@ export function RecentEnvelopesList() {
         );
     };
 
+    if (!isExpanded) {
+        return (
+            <div 
+                className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col items-center py-4 h-125 lg:h-[calc(100vh-160px)] w-full cursor-pointer hover:bg-gray-50 transition-colors"
+                onClick={onToggle}
+                title="최근 내역 펼치기"
+            >
+                <button className="p-2 text-gray-500 hover:text-blue-600 mb-6 lg:mb-10">
+                    <ChevronLeft className="w-6 h-6" />
+                </button>
+                <div 
+                    className="text-gray-500 font-bold tracking-[0.2em] text-sm whitespace-nowrap" 
+                    style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+                >
+                    최근 접수 내역
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-125 lg:h-[calc(100vh-160px)] relative">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-125 lg:h-[calc(100vh-160px)] relative opacity-100 transition-opacity duration-300">
             <div className="p-4 border-b border-gray-200 sticky top-0 bg-white rounded-t-xl z-10 space-y-3">
                 <div className="flex justify-between items-center">
-                    <h2 className="font-bold text-gray-800 shrink-0">
-                        접수 내역 <span className="text-blue-600 text-sm ml-1 font-normal hidden sm:inline">{processedEnvelopes.length}건</span>
-                    </h2>
+                    <div className="flex items-center gap-2">
+                        {onToggle && (
+                            <button
+                                onClick={onToggle}
+                                className="p-1.5 -ml-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors shrink-0"
+                                title="목록 접기"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        )}
+                        <h2 className="font-bold text-gray-800 shrink-0">
+                            접수 내역 <span className="text-blue-600 text-sm ml-1 font-normal hidden sm:inline">{processedEnvelopes.length}건</span>
+                        </h2>
+                    </div>
                     <div className="flex gap-2">
                         <button
                             onClick={() => {

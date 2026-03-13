@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useEnvelopes } from '../hooks/useEnvelopes';
-import { ChevronDown, ListOrdered } from 'lucide-react';
+import { ChevronRight, ChevronLeft, ListOrdered } from 'lucide-react';
 
 export function MiniRecentList() {
     const { envelopes, isLoading } = useEnvelopes();
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(true);
 
     // Get the most recent 10 envelopes
     const recentEnvelopes = envelopes
@@ -16,55 +16,54 @@ export function MiniRecentList() {
     }
 
     return (
-        <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
-            {/* Collapsible Panel */}
-            <div 
-                className={`bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden transition-all duration-300 ease-in-out origin-bottom-right mb-3 ${isOpen ? 'opacity-100 scale-100 w-72 md:w-80' : 'opacity-0 scale-95 w-0 h-0 border-none'}`}
+        <>
+            {/* Sidebar Panel */}
+            <div
+                className={`fixed top-0 right-0 h-full bg-white shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)] border-l border-gray-200 z-40 transition-all duration-300 ease-in-out flex flex-col ${isOpen ? 'w-80 md:w-96 translate-x-0' : 'w-0 translate-x-full'}`}
             >
-                <div className="bg-gray-800 text-white p-3 flex justify-between items-center">
-                    <h3 className="font-bold text-sm flex items-center gap-2">
-                        <ListOrdered className="w-4 h-4" />
-                        최근 입력 내역
+                {/* Header */}
+                <div className="bg-gray-800 text-white p-4 flex justify-between items-center shrink-0 h-[64px] border-b border-gray-700">
+                    <h3 className="font-bold text-base flex items-center gap-2">
+                        <ListOrdered className="w-5 h-5" />
+                        최근 접수 내역
                     </h3>
-                    <span className="text-xs text-gray-400 bg-gray-700 px-2 py-0.5 rounded-full">최근 10건</span>
+                    <span className="text-xs text-gray-300 bg-gray-700 px-2 py-1 rounded-full border border-gray-600">최근 10건</span>
                 </div>
-                
-                <div className="max-h-60 overflow-y-auto p-2 space-y-2">
+
+                {/* List Content */}
+                <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50">
                     {recentEnvelopes.map(env => (
-                        <div key={env.id} className="flex justify-between items-center p-2 rounded-lg bg-gray-50 border border-gray-100 text-sm">
-                            <div className="flex items-center gap-2 overflow-hidden">
-                                <span className="font-bold text-gray-500 w-6 shrink-0">{env.seq_number}</span>
-                                <div className="truncate flex flex-col">
+                        <div key={env.id} className="flex justify-between items-center p-3 rounded-xl bg-white border border-gray-200 shadow-sm hover:border-blue-300 transition-colors">
+                            <div className="flex items-center gap-3 overflow-hidden">
+                                <span className="font-bold text-gray-500 w-7 shrink-0 text-center">{env.seq_number}</span>
+                                <div className="flex flex-col overflow-hidden">
                                     <span className="font-semibold text-gray-900 truncate">
                                         {env.name || '이름 미상'}
                                     </span>
-                                    {env.relation && <span className="text-xs text-gray-500 truncate">{env.relation}</span>}
+                                    {env.relation && <span className="text-xs text-gray-500 truncate mt-0.5">{env.relation}</span>}
                                 </div>
                             </div>
-                            <div className="flex flex-col items-end shrink-0 ml-2">
+                            <div className="flex flex-col items-end shrink-0 ml-3">
                                 <span className="font-bold text-blue-700">{env.amount.toLocaleString()}원</span>
-                                {env.meal_tickets > 0 && <span className="text-xs text-gray-500">식권 {env.meal_tickets}장</span>}
+                                {env.meal_tickets > 0 && <span className="text-xs text-gray-500 mt-0.5">식권 {env.meal_tickets}장</span>}
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Floating Action Button */}
+            {/* Toggle Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center justify-center rounded-full shadow-lg transition-all duration-300 ${isOpen ? 'bg-gray-800 text-white w-12 h-12' : 'bg-blue-600 hover:bg-blue-700 text-white px-4 h-12 gap-2'}`}
-                title="최근 내역 보기"
+                className={`fixed top-1/2 -translate-y-1/2 z-50 flex items-center justify-center bg-white border border-gray-200 shadow-md text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 rounded-l-xl w-8 h-16 ${isOpen ? 'right-80 md:right-96' : 'right-0'}`}
+                title={isOpen ? "최근 내역 닫기" : "최근 내역 열기"}
             >
                 {isOpen ? (
-                    <ChevronDown className="w-6 h-6" />
+                    <ChevronRight className="w-6 h-6" />
                 ) : (
-                    <>
-                        <ListOrdered className="w-5 h-5" />
-                        <span className="font-bold text-sm">최근 내역 ({recentEnvelopes.length})</span>
-                    </>
+                    <ChevronLeft className="w-6 h-6" />
                 )}
             </button>
-        </div>
+        </>
     );
 }
