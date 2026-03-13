@@ -3,6 +3,7 @@ CREATE TABLE public.weddings (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   bride_name text NOT NULL,
   groom_name text NOT NULL,
+  password text NOT NULL,
   wedding_date timestamp with time zone,
   created_at timestamp with time zone DEFAULT now() NOT NULL
 );
