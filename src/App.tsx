@@ -1,5 +1,6 @@
 
 import { Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { useSupabaseRealtime } from './hooks/useSupabaseRealtime';
 import { InputPage } from './pages/InputPage';
 import { AdminPage } from './pages/AdminPage';
@@ -9,10 +10,13 @@ function App() {
   useSupabaseRealtime();
 
   return (
-    <Routes>
-      <Route path="/" element={<InputPage />} />
-      <Route path="/admin" element={<AdminPage />} />
-    </Routes>
+    <>
+      <Toaster position="top-center" reverseOrder={false} />
+      <Routes>
+        <Route path="/" element={<InputPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+      </Routes>
+    </>
   );
 }
 

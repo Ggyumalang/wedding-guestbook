@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { useEnvelopes } from '../hooks/useEnvelopes';
 import type { InsertEnvelope } from '../types/database';
 import { useGuestbookStore } from '../store/useGuestbookStore';
@@ -76,10 +77,18 @@ export function EnvelopeForm() {
                 amount: 0,
                 meal_tickets: 1,
             });
+            toast.success('접수가 완료되었습니다!', {
+                duration: 2500,
+                style: {
+                    background: '#10b981',
+                    color: '#fff',
+                    fontWeight: 'bold',
+                },
+            });
             setTimeout(() => setFocus('seq_number'), 0);
         } catch (error) {
             console.error('Failed to save envelope', error);
-            alert('저장 중 오류가 발생했습니다.');
+            toast.error('저장 중 오류가 발생했습니다.');
         }
     };
 

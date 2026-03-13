@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { useEnvelopes } from '../hooks/useEnvelopes';
 import { Trash2, Edit2, Search, X, ArrowDownAZ, ArrowUpZA, UserX, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Envelope } from '../types/database';
@@ -63,11 +64,25 @@ export function RecentEnvelopesList() {
 
     const handleSaveEdit = () => {
         if (!editingEnv) return;
-        updateEnvelope.mutate({
-            id: editingEnv.id,
-            updates: { name: editName, relation: editRelation, memo: editMemo }
-        });
-        setEditingEnv(null);
+        updateEnvelope.mutate(
+            { id: editingEnv.id, updates: { name: editName, relation: editRelation, memo: editMemo } },
+            {
+                onSuccess: () => {
+                    toast.success('상세 정보가 수정되었습니다!', {
+                        duration: 2500,
+                        style: {
+                            background: '#10b981',
+                            color: '#fff',
+                            fontWeight: 'bold',
+                        },
+                    });
+                    setEditingEnv(null);
+                },
+                onError: () => {
+                    toast.error('저장 중 오류가 발생했습니다.');
+                }
+            }
+        );
     };
 
     return (
