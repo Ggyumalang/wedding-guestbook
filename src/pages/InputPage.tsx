@@ -1,6 +1,7 @@
 import { useGuestbookStore } from '../store/useGuestbookStore';
 import { WeddingSelector } from '../components/WeddingSelector';
 import { EnvelopeForm } from '../components/EnvelopeForm';
+import { MiniRecentList } from '../components/MiniRecentList';
 import { Link } from 'react-router-dom';
 
 export function InputPage() {
@@ -11,7 +12,7 @@ export function InputPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-gray-50 flex flex-col relative">
             <nav className="bg-white shadow-sm border-b border-gray-200 px-3 md:px-4 py-3 flex justify-between items-center w-full">
                 <h1 className="text-lg font-bold text-gray-800 shrink-0">
                     {side} 접수
@@ -37,6 +38,8 @@ export function InputPage() {
                     <EnvelopeForm />
                 </div>
             </main>
+            
+            <MiniRecentList />
         </div>
     );
 }

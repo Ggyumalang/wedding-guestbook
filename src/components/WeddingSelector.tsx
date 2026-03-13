@@ -13,11 +13,24 @@ export function WeddingSelector() {
     const [isCreating, setIsCreating] = useState(false);
     const [newGroom, setNewGroom] = useState('');
     const [newBride, setNewBride] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    
+    const [joinPassword, setJoinPassword] = useState('');
 
     const handleEnter = (id: string, selectedSide: '신랑측' | '신부측') => {
-        if (id.trim()) {
-            setWeddingInfo(id.trim(), selectedSide);
+        if (!id.trim()) return;
+        
+        const targetWedding = weddings.find(w => w.id === id);
+        if (!targetWedding) return;
+
+        // If the wedding has a password, we must verify it matches the entered one.
+        // For backwards compatibility, if it doesn't have a password, we let them in.
+        if (targetWedding.password && targetWedding.password !== joinPassword) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
         }
+
+        setWeddingInfo(id.trim(), selectedSide);
     };
 
     const handleCreateAndEnter = async (e: React.FormEvent) => {
@@ -28,6 +41,7 @@ export function WeddingSelector() {
             const newWedding = await createWedding.mutateAsync({
                 groom_name: newGroom,
                 bride_name: newBride,
+                password: newPassword || undefined,
                 wedding_date: new Date().toISOString()
             });
             // 생성 후 바로 입장
@@ -81,7 +95,10 @@ export function WeddingSelector() {
                                     {weddings.map(w => (
                                         <button
                                             key={w.id}
-                                            onClick={() => setInputWeddingId(w.id)}
+                                            onClick={() => {
+                                                setInputWeddingId(w.id);
+                                                setJoinPassword('');
+                                            }}
                                             className={`w-full text-left p-3 rounded-xl border transition-all ${weddingId === w.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
                                         >
                                             <div className="font-bold text-gray-900">{w.groom_name} & {w.bride_name}</div>
@@ -106,6 +123,17 @@ export function WeddingSelector() {
                                             <div className={`text-center py-3 rounded-xl border-2 transition-all ${side === '신부측' ? 'border-pink-500 bg-pink-50 text-pink-700 font-bold' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}`}>신부측</div>
                                         </label>
                                     </div>
+                                </div>
+
+                                <div className="border-t border-gray-100 pt-4">
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">접수대 입장 비밀번호</label>
+                                    <input
+                                        type="password"
+                                        value={joinPassword}
+                                        onChange={(e) => setJoinPassword(e.target.value)}
+                                        placeholder="비밀번호 4자리 (생성 시 설정한 값)"
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm mb-4"
+                                    />
                                 </div>
 
                                 <button
@@ -147,6 +175,17 @@ export function WeddingSelector() {
                                     className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                                 />
                             </div>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">접수대 접속 비밀번호 (선택)</label>
+                            <input
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                placeholder="숫자 4자리 등 원하는 암호를 입력하세요"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                            />
                         </div>
 
                         <div className="border-t border-gray-100 pt-4">
